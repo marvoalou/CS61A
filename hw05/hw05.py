@@ -20,6 +20,16 @@ def make_bank(balance):
     """
     def bank(message, amount):
         "*** YOUR CODE HERE ***"
+        nonlocal balance
+        if message == 'withdraw':
+            if balance < amount:
+                return 'Insufficient funds'
+            balance -= amount
+        elif message == 'deposit':
+            balance += amount
+        else:
+            return 'Invalid message'
+        return balance
     return bank
 
 
@@ -52,6 +62,21 @@ def make_withdraw(balance, password):
     True
     """
     "*** YOUR CODE HERE ***"
+    lst = []
+    def verify(amount, input):
+        nonlocal balance,lst
+        if len(lst) == 3:
+            return f"Too many incorrect attempts. Attempts: ['{lst[0]}', '{lst[1]}', '{lst[2]}']"
+        if input == password:
+            if amount > balance:
+                return 'Insufficient funds'
+            else:
+                balance -= amount
+        else:
+            lst.append(input)
+            return 'Incorrect password'
+        return balance
+    return verify
 
 
 def repeated(t, k):
@@ -76,9 +101,26 @@ def repeated(t, k):
     """
     assert k > 1
     "*** YOUR CODE HERE ***"
+    #另一种思路，使用k-1的递归来完成
+    tem = float('inf')
+    pro = float('inf')
+    count = 1
+    while tem:
+        tem = next(t)
+        if tem == 'end':
+            break
+        if pro == tem:
+            count+=1
+            if count == k:
+                return tem
+        else:
+            count = 1
+        pro = tem
+    return 0
 
 
-def merge(incr_a, incr_b):
+
+def merge(incr_a, incr_b):      #思想：为什么要使用迭代器的方法来进行操作？可以扩展到无限(列表是无法传入无限的，递归也会占用空间)
     """Yield the elements of strictly increasing iterables incr_a and incr_b, removing
     repeats. Assume that incr_a and incr_b have no repeats. incr_a or incr_b may be infinite
     sequences.
@@ -95,10 +137,27 @@ def merge(incr_a, incr_b):
     >>> [next(m) for _ in range(11)]
     [0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
     """
-    iter_a, iter_b = iter(incr_a), iter(incr_b)
-    next_a, next_b = next(iter_a, None), next(iter_b, None)
+    iter_a, iter_b = iter(incr_a), iter(incr_b)     ##参数统一转化为迭代器
+    next_a, next_b = next(iter_a, None), next(iter_b, None)     ##
     "*** YOUR CODE HERE ***"
-
+    while next_a != None or next_b != None:
+        if next_b == None:
+            yield next_a
+            next_a = next(iter_a,None)
+        elif next_a == None:
+            yield next_b
+            next_b = next(iter_b,None)
+        elif next_a == next_b:
+            yield next_a
+            next_a = next(iter_a,None)
+            next_b = next(iter_b,None)
+        elif next_a > next_b:
+            yield next_b
+            next_b = next(iter_b,None)
+        else:
+            yield next_a
+            next_a = next(iter_a,None)
+        
 
 def make_joint(withdraw, old_pass, new_pass):
     """Return a password-protected withdraw function that has joint access to
@@ -173,6 +232,7 @@ def remainders_generator(m):
     11
     """
     "*** YOUR CODE HERE ***"
+
 
 
 def naturals():
