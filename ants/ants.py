@@ -25,6 +25,8 @@ class Place:
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
+        if self.exit:
+            exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -89,6 +91,7 @@ class Insect:
         self.place = place
 
     def remove_from(self, place):
+        #place属性置空
         self.place = None
 
 
@@ -142,6 +145,7 @@ class HarvesterAnt(Ant):
     name = 'Harvester'
     implemented = True
     # OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 2
 
     def action(self, gamestate):
         """Produce 1 additional food for the colony.
@@ -150,6 +154,7 @@ class HarvesterAnt(Ant):
         """
         # BEGIN Problem 1
         "*** YOUR CODE HERE ***"
+        gamestate.food += 1
         # END Problem 1
 
 
@@ -160,6 +165,9 @@ class ThrowerAnt(Ant):
     implemented = True
     damage = 1
     # ADD/OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 3
+    max_range = float('inf')
+    min_range = 0
 
     def nearest_bee(self, beehive):
         """Return the nearest Bee in a Place that is not the HIVE, connected to
@@ -168,7 +176,17 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        return rANTdom_else_none(self.place.bees) # REPLACE THIS LINE
+        place = self.place
+        dis = 0
+        while place is not beehive and dis <= self.max_range:
+            if place.bees == [] or dis < self.min_range:
+                dis += 1
+                place = place.entrance
+                continue
+            else:
+                return rANTdom_else_none(place.bees)
+        return None
+
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -197,7 +215,10 @@ class ShortThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+
+    max_range = 3
+    
     # END Problem 4
 
 class LongThrower(ThrowerAnt):
@@ -207,7 +228,10 @@ class LongThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+
+    min_range = 5
+    
     # END Problem 4
 
 class FireAnt(Ant):
@@ -217,8 +241,9 @@ class FireAnt(Ant):
     damage = 3
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
+
     # BEGIN Problem 5
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 5
 
     def __init__(self, armor=3):
@@ -233,7 +258,21 @@ class FireAnt(Ant):
         if the fire ant dies.
         """
         # BEGIN Problem 5
+        #当改变当前数据时，要做副本，考虑到之后的迭代影响
         "*** YOUR CODE HERE ***"
+        lst = self.place.bees[:]
+        
+        for bee in lst:
+            bee.reduce_armor(amount)
+        self.place.bees = lst
+        
+        if self.armor - amount <= 0:
+            #开爆！
+            for bee in lst:
+                bee.reduce_armor(self.damage)
+            self.place.bees = lst
+        Ant.reduce_armor(self,amount)
+        
         # END Problem 5
 
 class HungryAnt(Ant):

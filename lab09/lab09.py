@@ -8,6 +8,19 @@ def convert_link(link):
     []
     """
     "*** YOUR CODE HERE ***"
+    #recursive
+    # while link is Link.empty:
+    #     return []
+    # return [link.first] + convert_link(link.rest)
+
+    #iterative
+    re = []
+    while link is not Link.empty:
+        re.append(link.first)
+        link = link.rest
+    return re
+    
+
 
 
 def every_other(s):
@@ -28,6 +41,23 @@ def every_other(s):
     Link(4)
     """
     "*** YOUR CODE HERE ***"
+    ##编程能力就像作题能力，为什么作题脑子的cpu'能拉满，因为熟悉，并且有数学思维，编程要锻炼编程思维，多做题
+    ##经常卡在一些细节上，所以得多练形成习惯
+    # if s.rest is Link.empty or s.rest.rest is Link.empty:
+    #     pass
+    # else:
+    #     a = s
+    #     while a.rest.rest is not Link.empty:
+    #         a.rest = a.rest.rest
+    #         a = a.rest
+    #         if a.rest == Link.empty:
+    #             break
+    #     if a.rest:
+    #         a.rest = Link.empty
+
+    while s is not Link.empty and s.rest is not Link.empty:
+        s.rest = s.rest.rest
+        every_other(s.rest)
 
 
 def label_squarer(t):
@@ -37,8 +67,11 @@ def label_squarer(t):
     >>> label_squarer(t)
     >>> t
     Tree(1, [Tree(9, [Tree(25)]), Tree(49)])
-    """
-    "*** YOUR CODE HERE ***"
+    """ "*** YOUR CODE HERE ***"
+    ## 递归不要推导底层，考虑操作和下一个就可以了，信仰之越
+    t.label = t.label**2
+    for b in t.branches:
+        label_squarer(b)
 
 
 def cumulative_mul(t):
@@ -51,6 +84,9 @@ def cumulative_mul(t):
     Tree(105, [Tree(15, [Tree(5)]), Tree(7)])
     """
     "*** YOUR CODE HERE ***"
+    for b in t.branches:
+        cumulative_mul(b)
+        t.label *= b.label
 
 
 def has_cycle(link):
@@ -68,8 +104,14 @@ def has_cycle(link):
     False
     """
     "*** YOUR CODE HERE ***"
+    a = link
+    while a is not Link.empty:
+        a = a.rest
+        if a is link:
+            return True
+    return False
 
-def has_cycle_constant(link):
+def has_cycle_constant(link):###!!!
     """Return whether link contains a cycle.
 
     >>> s = Link(1, Link(2, Link(3)))
@@ -97,6 +139,17 @@ def reverse_other(t):
     Tree(1, [Tree(8, [Tree(3, [Tree(5), Tree(4)]), Tree(6, [Tree(7)])]), Tree(2)])
     """
     "*** YOUR CODE HERE ***"
+    #1、不要用内置函数作为变量名
+    #2、range只处理整数，要整除
+    #3、循环注意界限
+    #4、先搞清整体架构
+    if not t.is_leaf():
+        len1 = len(t.branches)
+        for i in range(len1//2):
+            t.branches[i].label, t.branches[len1-1-i].label = t.branches[len1 - 1 - i].label, t.branches[i].label
+        for b1 in t.branches:
+            for b2 in b1.branches:
+                reverse_other(b2)
 
 
 class Link:

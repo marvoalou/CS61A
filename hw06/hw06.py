@@ -51,6 +51,39 @@ class VendingMachine:
     """
     "*** YOUR CODE HERE ***"
 
+    def __init__(self,name,price):
+        self.name = name
+        self.price = price
+        self.funds = 0
+        self.stock = 0
+
+    def add_funds(self,add_price):
+        '''有货则返回余额，没货就给回去'''
+        if self.stock == 0:
+            return 'Inventory empty. Restocking required. Here is your ${}.'.format(add_price)
+        else:
+            self.funds += add_price
+            return 'Current balance: ${}'.format(self.funds)
+
+    def restock(self,num):
+        assert num > 0, 'Meaningless Number!'
+        self.stock += num
+        return 'Current {} stock: {}'.format(self.name,self.stock)
+    
+    def vend(self):
+        if self.stock == 0:
+            return 'Inventory empty. Restocking required.'
+        if self.funds < self.price:
+            return 'You must add ${} more funds.'.format(self.price - self.funds)
+        else:
+            self.stock -= 1
+            self.funds -= self.price
+            if self.funds > 0 :
+                change = self.funds
+                self.funds = 0
+                return 'Here is your {} and ${} change.'.format(self.name,change)
+            return 'Here is your {}.'.format(self.name)
+
 
 class Mint:
     """A mint creates coins by stamping on years.
@@ -88,9 +121,13 @@ class Mint:
 
     def create(self, kind):
         "*** YOUR CODE HERE ***"
+        return kind(self.year)
 
     def update(self):
         "*** YOUR CODE HERE ***"
+        #还有旧币，没有更新的话年份不变
+        self.year = Mint.current_year
+        
 
 class Coin:
     def __init__(self, year):
@@ -98,6 +135,8 @@ class Coin:
 
     def worth(self):
         "*** YOUR CODE HERE ***"
+        sub = Mint.current_year - self.year - 50 
+        return self.cents + sub if sub > 0 else self.cents
 
 class Nickel(Coin):
     cents = 5
@@ -132,6 +171,36 @@ def is_bst(t):
     False
     """
     "*** YOUR CODE HERE ***"
+    #WOW! EZ
+    def bst_max(tree):
+        max = tree.label
+        for b in tree.branches:    
+            max = tree.label if tree.label > bst_max(b) else bst_max(b)
+        return max
+    
+    def bst_min(tree):
+        min = tree.label
+        for b in tree.branches:    
+            min = tree.label if tree.label < bst_min(b) else bst_min(b)
+        return min
+    
+    def sub_is_bst(t):
+        for b in t.branches:
+            flag = is_bst(b)
+            if flag == False:
+                return flag
+        return True
+    
+    if t.is_leaf():
+        return True
+    
+    if len(t.branches) > 2 :
+        return False
+    elif len(t.branches) == 1:
+        return True
+    else:
+        return bst_max(t.branches[0]) <= t.label and bst_min(t.branches[1]) >= t.label and sub_is_bst(t)
+
 
 
 def store_digits(n):
@@ -150,6 +219,16 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    def lennum(a):
+        cnt = 0
+        while a > 0:
+            a = a//10
+            cnt += 1
+        return cnt
+    if n < 10:
+        return Link(n)
+    digit = n//(10**(lennum(n)-1))
+    return Link(digit, store_digits(n % 10**(lennum(n)-1)))
 
 
 def path_yielder(t, value):
@@ -187,12 +266,21 @@ def path_yielder(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
 
-    "*** YOUR CODE HERE ***"
-
-    for _______________ in _________________:
-        for _______________ in _________________:
-
+    ## 递归的信仰之越，无关返回类型，只关心现在的判断和下一个关系
+    ## 生成器遇到return，会停止这一项的yield，但是不会返回值，这题表现为停止一条路径，继续执行下面的yield
+    ## 因为到叶子节点的时候，path函数是函数，所以返回上一级
+    ## 抽象思维，先抽象再具象，如果以上来就具象的话会很难完成
+    if t.label == value:
+        yield [t.label]
+    elif t.is_leaf():
+        #use return instead of yield! because the road does not exit, so we shouldn't yield it
+        return []   
+    for b in t.branches:
+        for road in path_yielder(b, value):
             "*** YOUR CODE HERE ***"
+            road.insert(0, t.label)
+            yield road
+    
 
 
 def remove_all(link , value):
@@ -213,6 +301,12 @@ def remove_all(link , value):
     <0 1>
     """
     "*** YOUR CODE HERE ***"
+    #?为什么做起来难度这么大，对于递归要清楚函数的功能，先将函数本身的功能定义好
+    if link is Link.empty:
+        return
+    while not link.rest is Link.empty and link.rest.first == value:
+        link.rest = link.rest.rest
+    remove_all(link.rest, value)
 
 
 def deep_map(f, link):
@@ -229,6 +323,14 @@ def deep_map(f, link):
     <<2 <4 6> 8> <<10>>>
     """
     "*** YOUR CODE HERE ***"
+    ## ok!
+    if link == Link.empty:
+        return Link.empty
+    if isinstance(link.first,Link):
+        return Link(deep_map(f,link.first), deep_map(f,link.rest))
+    else:
+        return Link(f(link.first),deep_map(f,link.rest))
+    
 
 
 class Tree:

@@ -9,27 +9,21 @@ test = {
           >>> from car import *
           >>> deneros_car = Car('Tesla', 'Model S')
           >>> deneros_car.model
-          066daa99c4c14fba33ca7fea6de5139e
-          # locked
+          'Model S'
           >>> deneros_car.gas = 10
           >>> deneros_car.drive()
-          6782dfbb8a7616b3f504afa7bdbc4efe
-          # locked
+          'Tesla Model S goes vroom!'
           >>> deneros_car.drive()
-          85ac99d9ea4aac334a8bfe842d10c09d
-          # locked
+          'Cannot drive!'
           >>> deneros_car.fill_gas()
-          7b0c88ff69d31a8e50f681edcc9d6ef5
-          # locked
+          'Gas level: 20'
           >>> deneros_car.gas
-          2b5c8adf725274c931c4272b26ac97ea
-          # locked
+          20
           >>> Car.gas
-          e0c9124d3360b0721b517ec33d41b017
-          # locked
+          30
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
@@ -37,14 +31,11 @@ test = {
           >>> deneros_car = Car('Tesla', 'Model S')
           >>> deneros_car.wheels = 2
           >>> deneros_car.wheels
-          9338923f09aac77121029c604f7ce4f3
-          # locked
+          2
           >>> Car.num_wheels
-          612ff2a71cad53bc4c7f85fac678a06d
-          # locked
+          4
           >>> deneros_car.drive() # Type Error if an error occurs and Nothing if nothing is displayed
-          85ac99d9ea4aac334a8bfe842d10c09d
-          # locked
+          'Cannot drive!'
           >>> Car.drive() # Type Error if an error occurs and Nothing if nothing is displayed
           8a2fd4e4c3c6dcce2dc631af62ee217a
           # locked
